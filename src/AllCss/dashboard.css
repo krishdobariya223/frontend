@@ -1,0 +1,161 @@
+/* Dashboard.css */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: white;
+}
+
+.container-fluid {
+    width: 1250px;
+    padding: 20px;
+    height: 100vh;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    color: #333;
+    font-size: 28px;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.table-container {
+    margin-top: 20px;
+    overflow-x: auto;
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background-color: #fff;
+}
+
+.custom-table th,
+.custom-table td {
+    padding: 15px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.custom-table th {
+    background-color: #4e73df;
+    color: white;
+    font-size: 16px;
+}
+
+.custom-table td {
+    background-color: #f9f9f9;
+}
+
+.custom-table tr:nth-child(even) td {
+    background-color: #f1f1f1;
+}
+
+.custom-table tr:hover td {
+    background-color: #e9ecef;
+}
+
+.custom-table a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+.custom-table a:hover {
+    text-decoration: underline;
+}
+
+.custom-table .btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.custom-table .update-btn {
+    background-color: #ffcc00;
+    border-color: #ffcc00;
+    color: white;
+}
+
+.custom-table .delete-btn {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.custom-table .update-btn:hover {
+    background-color: #e6b800;
+}
+
+.custom-table .delete-btn:hover {
+    background-color: #c82333;
+}
+
+.modal-header {
+    background-color: #4e73df;
+    color: white;
+}
+
+.modal-title {
+    font-size: 20px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.form-group label {
+    font-size: 14px;
+    color: #333;
+}
+
+.form-control {
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.toast-container {
+    margin-top: 20px;
+}
+
+.fa-update {
+    background: linear-gradient(to right, #0482D7, #33A2F7);
+    color: white;
+    border: none;
+    padding: 5px;
+    box-shadow: 0px 2px 5px #5073EA;
+    width: 35px;
+}
+
+.fa-delete {
+    background: linear-gradient(to right, #970202, #c30d0d);
+    border: none;
+    padding: 5px;
+    box-shadow: 0px 2px 5px #dd6d57;
+    width: 35px;
+}
+
+.fa-view {
+    background: linear-gradient(to left, #8863E9, #5073EA);
+    border: none;
+    padding: 5px;
+    box-shadow: 0px 2px 5px #5073EA;
+    width: 35px;
+}
+
+.fa-input{
+    background-color: #5073EA;
+    border: none;
+    padding: 5px;
+    width: 50px;
+    height: 50px;
+}
