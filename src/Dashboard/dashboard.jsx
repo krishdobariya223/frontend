@@ -31,7 +31,7 @@ const Dashboard = () => {
     // Get All Video
     const fetchVideos = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/api/videos/get-all-videos');
+            const response = await axios.get('https://backend-production-17db.up.railway.app/api/videos/get-all-videos');
             setVideos(response.data.videos);
             setFilteredVideos(response.data.videos);
         } catch (error) {
@@ -46,7 +46,7 @@ const Dashboard = () => {
     // Get All Tokens
     const fetchTokens = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/api/token/getAllTokens');
+            const response = await axios.get('https://backend-production-17db.up.railway.app/api/token/getAllTokens');
             setTokens(response.data.tokens);
         } catch (error) {
             console.error(error);
@@ -81,7 +81,7 @@ const Dashboard = () => {
 
         setIsLoading(true);
         try {
-            await axios.post('http://localhost:3000/api/videos/create-video', {
+            await axios.post('https://backend-production-17db.up.railway.app/api/videos/create-video', {
                 video_link: videoLink,
                 type: videoType,
             });
@@ -110,7 +110,7 @@ const Dashboard = () => {
 
         if (newVideoLink && newType) {
             try {
-                await axios.put(`http://localhost:3000/api/videos/update-video/${id}`, {
+                await axios.put(`https://backend-production-17db.up.railway.app/api/videos/update-video/${id}`, {
                     video_link: newVideoLink,
                     type: newType,
                 });
@@ -131,7 +131,7 @@ const Dashboard = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this video?')) {
             try {
-                await axios.delete(`http://localhost:3000/api/videos/delete-video/${id}`);
+                await axios.delete(`https://backend-production-17db.up.railway.app/api/videos/delete-video/${id}`);
                 setMsg('Video deleted successfully');
                 setTimeout(() => { setMsg(''); }, 2000);
                 fetchVideos();
@@ -172,7 +172,7 @@ const Dashboard = () => {
         setIsTokenLoading(true);
         try {
             for (const tokenValue of tokenValues) {
-                await axios.post('http://localhost:3000/api/token/create', { token_value: tokenValue });
+                await axios.post('https://backend-production-17db.up.railway.app/api/token/create', { token_value: tokenValue });
             }
 
             setTokenValues([]);
@@ -206,7 +206,7 @@ const Dashboard = () => {
 
     const handleDeleteToken = async (id) => {
         try {
-            await axios.delete(`http://localhost:3000/api/token/deleteToken/${id}`);
+            await axios.delete(`https://backend-production-17db.up.railway.app/api/token/deleteToken/${id}`);
 
             fetchTokens();
         } catch (error) {
