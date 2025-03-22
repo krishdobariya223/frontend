@@ -262,7 +262,7 @@ const Dashboard = () => {
         setIsChecked(newState);
 
         try {
-            const response = await axios.post('http://localhost:3000/api/config/toggle-state', { value: newState });
+            const response = await axios.post('https://video-call-backend-production-4619.up.railway.app/api/config/toggle-state', { value: newState });
 
             if (response.status === 200) {
                 console.log("Toggle state updated successfully on backend.");
