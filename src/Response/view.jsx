@@ -10,7 +10,7 @@ const ViewResponse = () => {
 
     const fetchVideos = async () => {
         try {
-            const response = await axios.get('https://backend-production-17db.up.railway.app/api/videos/get-all-videos');
+            const response = await axios.get('https://video-call-backend-production-4619.up.railway.app/api/videos/get-all-videos');
             setVideos(response.data.videos);
         } catch (error) {
             console.error(error);
@@ -28,7 +28,6 @@ const ViewResponse = () => {
             </Button>
             <div className='view-div p-0'>
                 <pre style={{ fontSize: '11px' }}>{JSON.stringify(videos, null, 2)}</pre>
-
             </div>
         </div>
     );

@@ -15,7 +15,7 @@ const Login = () => {
         e.preventDefault();
 
         try {
-            const response = await axios.post('https://backend-production-17db.up.railway.app/api/auth/login', {
+            const response = await axios.post('https://video-call-backend-production-4619.up.railway.app/api/auth/login', {
                 email,
                 password
             });
