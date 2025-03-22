@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { Modal, Button, Form, InputGroup } from 'react-bootstrap';
 import '../AllCss/dashboard.css';
 
@@ -7,6 +8,7 @@ const Dashboard = () => {
     const [videos, setVideos] = useState([]);
     const [filteredVideos, setFilteredVideos] = useState([]);
     const [showModal, setShowModal] = useState(false);
+    const [showupModal, setShowupModal] = useState(false);
     const [videoLink, setVideoLink] = useState('');
     const [videoType, setVideoType] = useState('0');
     const [isLoading, setIsLoading] = useState(false);
@@ -17,16 +19,21 @@ const Dashboard = () => {
     const [tokens, setTokens] = useState([]);
     const [isTokenLoading, setIsTokenLoading] = useState(false);
     const [isSaveVisible, setIsSaveVisible] = useState(false);
+    const [isChecked, setIsChecked] = useState(false);
+    const [videoId, setVideoId] = useState(null);
 
     const handleShowModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
     const handleShowTokenModal = () => setShowTokenModal(true);
     const handleCloseTokenModal = () => setShowTokenModal(false);
 
+    const navigate = useNavigate();
+
     useEffect(() => {
         fetchVideos();
         fetchTokens();
     }, []);
+
 
     // Get All Video
     const fetchVideos = async () => {
@@ -104,27 +111,40 @@ const Dashboard = () => {
         }
     };
 
-    const handleUpdate = async (id, videoLink, videoType) => {
-        const newVideoLink = prompt("Enter new video link:", videoLink);
-        const newType = prompt("Enter new type:", videoType);
+    const handleUpdate = (id, currentLink, currentType) => {
+        setVideoId(id);
+        setVideoLink(currentLink);
+        setVideoType(currentType);
+        setShowupModal(true);
+    };
 
-        if (newVideoLink && newType) {
-            try {
-                await axios.put(`https://backend-production-17db.up.railway.app/api/videos/update-video/${id}`, {
-                    video_link: newVideoLink,
-                    type: newType,
-                });
-                setMsg('Video updated successfully');
-                setTimeout(() => {
-                    setMsg('');
-                }, 2000);
-                fetchVideos();
-            } catch (error) {
-                setMsg('Error updating video');
-                setTimeout(() => {
-                    setMsg('');
-                }, 2000);
-            }
+
+    const handleUpdateVideo = async () => {
+        if (!videoLink || !videoType) {
+            setMsg('Please provide both video link and type');
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            await axios.put(`https://backend-production-17db.up.railway.app/api/videos/update-video/${videoId}`, {
+                video_link: videoLink,
+                type: videoType,
+            });
+            setMsg('Video updated successfully');
+            setTimeout(() => {
+                setMsg('');
+            }, 1000);
+            handleupCloseModal();
+            fetchVideos();
+            window.location.reload();
+        } catch (error) {
+            setMsg('Error updating video');
+            setTimeout(() => {
+                setMsg('');
+            }, 2000);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -217,27 +237,86 @@ const Dashboard = () => {
         }
     };
 
+    const handleupCloseModal = () => {
+        setShowupModal(false);
+        setVideoLink('');
+        setVideoType('');
+    };
+
+    useEffect(() => {
+        const fetchToggleState = async () => {
+            try {
+                const response = await axios.get('http://localhost:3000/api/config/toggle-state');
+                setIsChecked(response.data.toggle_state);
+            } catch (error) {
+                console.error("Error fetching toggle state", error);
+            }
+        };
+
+        fetchToggleState();
+    }, []);
+
+    const handleToggle = async () => {
+        const newState = !isChecked;
+
+        setIsChecked(newState);
+
+        try {
+            const response = await axios.post('http://localhost:3000/api/config/toggle-state', { value: newState });
+
+            if (response.status === 200) {
+                console.log("Toggle state updated successfully on backend.");
+            }
+        } catch (error) {
+            console.error("Error updating toggle state", error);
+            setIsChecked(!newState);
+        }
+    };
+
     return (
         <div className="container-fluid p-4">
             <h2 className="text-center mb-4">Dashboard</h2>
 
             <div className="text-center mb-4">
-                <Button variant="" className='fa-update' style={{ width: '150px' }} onClick={handleShowModal}>
-                    Upload Video
-                </Button>
+                <div className="row justify-content-center">
+                    <div className="col-12 col-md-3 mb-2">
+                        <Button variant="" className="fa-update w-100" onClick={handleShowModal}>
+                            Upload Video
+                        </Button>
+                    </div>
+                    <div className="col-12 col-md-3 mb-2">
+                        <Button variant="" className="fa-update w-100" onClick={handleShowTokenModal}>
+                            Create Token
+                        </Button>
+                    </div>
+                    <div className="col-12 col-md-3 mb-2">
+                        <Button className="fa-update w-100" onClick={() => navigate('/response')}>
+                            View Response
+                        </Button>
+                    </div>
+                </div>
 
-                <Button variant="" className='fa-update ms-2' style={{ width: '150px' }} onClick={handleShowTokenModal}>
-                    Create Token
-                </Button>
+                <div className="mb-2 mt-1">
+                    <div className="d-flex justify-content-center align-items-center">
+                        <div className="form-label attribute-name fs-5 me-2">
+                            {isChecked ? 'ON' : 'OFF'}
+                        </div>
 
-                <div className="text-center mb-4 d-flex justify-content-end">
-                    <Button variant={filteredType === 0 ? 'secondary' : 'primary'} onClick={() => handleFilterType(0)} style={{ width: '120px' }}>
+                        <label className="switch">
+                            <input type="checkbox" checked={isChecked} onChange={handleToggle} />
+                            <span className="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div className="text-center mb-4 d-flex justify-content-center flex-wrap">
+                    <Button variant={filteredType === 0 ? 'secondary' : 'primary'} onClick={() => handleFilterType(0)} className="me-2 mb-2" style={{ width: '120px' }}>
                         Show Type 0
                     </Button>
-                    <Button variant={filteredType === 1 ? 'secondary' : 'primary'} className="ms-2" onClick={() => handleFilterType(1)} style={{ width: '120px' }}>
+                    <Button variant={filteredType === 1 ? 'secondary' : 'primary'} className="me-2 mb-2" onClick={() => handleFilterType(1)} style={{ width: '120px' }}>
                         Show Type 1
                     </Button>
-                    <Button variant={filteredType === 'all' ? 'secondary' : 'primary'} className="ms-2 d-flex justify-content-center" onClick={() => handleFilterType('all')} style={{ width: '40px' }}>
+                    <Button variant={filteredType === 'all' ? 'secondary' : 'primary'} className="me-2 mb-2" onClick={() => handleFilterType('all')} style={{ width: '120px' }}>
                         All
                     </Button>
                 </div>
@@ -249,7 +328,7 @@ const Dashboard = () => {
             <div className="table-container">
                 <table className="table table-bordered">
                     <thead>
-                        <tr className='text-center'>
+                        <tr className="text-center">
                             <th style={{ width: '100px' }}>ID</th>
                             <th>Video</th>
                             <th>Type</th>
@@ -260,10 +339,10 @@ const Dashboard = () => {
                         {filteredVideos.length > 0 ? (
                             filteredVideos.map((video, index) => (
                                 <tr key={video.id}>
-                                    <td className='text-center'>{video.id}</td>
-                                    <td className='text-center'>{index + 1}.mp4</td>
-                                    <td className='text-center'>{video.type}</td>
-                                    <td className='d-flex justify-content-center'>
+                                    <td className="text-center">{video.id}</td>
+                                    <td className="text-center">{index + 1}.mp4</td>
+                                    <td className="text-center">{video.type}</td>
+                                    <td className="d-flex justify-content-center">
                                         <button className="btn fa-update" onClick={() => handleUpdate(video.id, video.video_link, video.type)}>
                                             <i className="fa-solid fa-pen-to-square"></i>
                                         </button>
@@ -288,21 +367,19 @@ const Dashboard = () => {
             </div>
 
             {/* Modal for token Create */}
-            <Modal show={showTokenModal} onHide={() => setShowTokenModal(false)}>
-                <Modal.Header closeButton>
+            <Modal show={showTokenModal} onHide={() => setShowTokenModal(false)} centered>
+                <Modal.Header className='rounded-0' closeButton>
                     <Modal.Title>Create Token</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {/* Button to show input fields */}
                     <button className="fa-update mb-3" type="button" onClick={addInputGroup} style={{ width: '37px', height: '37px' }}>
                         <i className="fa-solid fa-plus d-flex justify-content-center"></i>
                     </button>
 
-                    {/* Render input fields dynamically */}
                     {tokenValues.map((value, index) => (
                         <div key={index} className="mb-3">
                             <InputGroup className="mb-3">
-                                <Form.Control className='rounded-2' type="text" placeholder="Enter token value" value={value} onChange={(e) => handleTokenValueChange(index, e.target.value)} />
+                                <Form.Control className="rounded-2" type="text" placeholder="Enter token value" value={value} onChange={(e) => handleTokenValueChange(index, e.target.value)} />
                                 <Button variant="danger" className="ms-2 rounded-2" onClick={() => removeInputGroup(index)} style={{ width: '30px', height: '30px', marginTop: '5px' }}>
                                     <i className="fa-solid fa-times d-flex justify-content-center"></i>
                                 </Button>
@@ -310,9 +387,8 @@ const Dashboard = () => {
                         </div>
                     ))}
 
-                    {/* Save button */}
                     {isSaveVisible && (
-                        <Button variant="primary" className="mt-1 w-25 d-flex justify-content-center" onClick={handleCreateToken} disabled={isTokenLoading || tokenValues.length === 0}>
+                        <Button variant="primary" className="mt-1 w-100 w-sm-auto d-flex justify-content-center" onClick={handleCreateToken} disabled={isTokenLoading || tokenValues.length === 0}>
                             {isTokenLoading ? 'Saving...' : 'Save'}
                         </Button>
                     )}
@@ -320,7 +396,7 @@ const Dashboard = () => {
 
                 <h5 className="p-1 ms-3">Tokens List</h5>
                 {tokens.map((token) => (
-                    <div key={token.id} className="">
+                    <div key={token.id}>
                         <InputGroup className="mb-3">
                             <Form.Control type="text" value={token.token_value} placeholder="Value" className="ms-3" />
                             <Button type="button" className="btn btn-danger mx-2 rounded-2" onClick={() => handleDeleteToken(token.id)} style={{ width: '30px', height: '30px', marginTop: '5px' }}>
@@ -331,32 +407,99 @@ const Dashboard = () => {
                 ))}
 
                 <Modal.Footer>
-                    <Button variant="danger" className="w-25" onClick={() => setShowTokenModal(false)}>
+                    <Button variant="danger" className="w-100 w-sm-auto" onClick={() => setShowTokenModal(false)}>
                         Close
                     </Button>
                 </Modal.Footer>
             </Modal>
 
+
             {/* Modal for Video Upload */}
-            <Modal show={showModal} onHide={handleCloseModal}>
-                <Modal.Header closeButton>
+            <Modal show={showModal} onHide={handleCloseModal} centered>
+                <Modal.Header className='rounded-0' closeButton>
                     <Modal.Title>Upload Video</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
                         <Form.Group controlId="formVideoLink">
                             <Form.Label>Video Link</Form.Label>
-                            <Form.Control type="text" placeholder="Enter video link or choose a file" value={videoLink} onChange={(e) => setVideoLink(e.target.value)} />
+                            <Form.Control
+                                type="text"
+                                placeholder="Enter video link or choose a file"
+                                value={videoLink}
+                                onChange={(e) => setVideoLink(e.target.value)}
+                            />
                         </Form.Group>
 
                         <Form.Group controlId="formFile">
                             <Form.Label className="mt-2">Choose Video File</Form.Label>
-                            <Form.Control type="file" accept="video/*" onChange={handleFileSelect} />
+                            <Form.Control
+                                type="file"
+                                accept="video/*"
+                                onChange={handleFileSelect}
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="formVideoType">
+                            <Form.Label className="mt-2">Video Type</Form.Label>
+                            <div className="input-group">
+                                <Form.Control
+                                    as="select"
+                                    value={videoType}
+                                    onChange={(e) => setVideoType(e.target.value)}
+                                    aria-label="Video Type"
+                                    className="custom-select-with-icon"
+                                >
+                                    <option value="0">Type 0</option>
+                                    <option value="1">Type 1</option>
+                                </Form.Control>
+                            </div>
+                        </Form.Group>
+                    </Form>
+
+                </Modal.Body>
+                <Modal.Footer>
+                    <div className="d-flex flex-column flex-md-row w-100">
+                        <Button
+                            variant="secondary"
+                            className="w-100 mb-2 mb-md-0"
+                            onClick={handleCloseModal}
+                        >
+                            Close
+                        </Button>
+                        <Button
+                            variant="primary ms-0 ms-md-2 w-100 w-md-auto"
+                            onClick={handleUpload}
+                            disabled={isLoading}
+                        >
+                            {isLoading ? 'Uploading...' : 'Upload'}
+                        </Button>
+                    </div>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal show={showupModal} onHide={handleupCloseModal} centered>
+                <Modal.Header className="rounded-0" closeButton>
+                    <Modal.Title>Update Video</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Form.Group controlId="formVideoLink">
+                            <Form.Label>Video Link</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="Enter new video link"
+                                value={videoLink}
+                                onChange={(e) => setVideoLink(e.target.value)}
+                            />
                         </Form.Group>
 
                         <Form.Group controlId="formVideoType">
                             <Form.Label className="mt-2">Video Type</Form.Label>
-                            <Form.Control as="select" value={videoType} onChange={(e) => setVideoType(e.target.value)}>
+                            <Form.Control
+                                as="select"
+                                value={videoType}
+                                onChange={(e) => setVideoType(e.target.value)}
+                            >
                                 <option value="0">Type 0</option>
                                 <option value="1">Type 1</option>
                             </Form.Control>
@@ -364,16 +507,26 @@ const Dashboard = () => {
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
-                    <div className='d-flex'>
-                        <Button variant="secondary" style={{ width: '230px' }} onClick={handleCloseModal}>Close</Button>
-                        <Button variant="primary ms-2" style={{ width: '230px' }} onClick={handleUpload} disabled={isLoading}>
-                            {isLoading ? 'Uploading...' : 'Upload'}
+                    <div className="d-flex flex-column flex-md-row w-100">
+                        <Button
+                            variant="secondary"
+                            className="w-100 mb-2 mb-md-0"
+                            onClick={handleupCloseModal}
+                        >
+                            Close
+                        </Button>
+                        <Button
+                            variant="primary ms-0 ms-md-2 w-100 w-md-auto"
+                            onClick={handleUpdateVideo}
+                            disabled={isLoading}
+                        >
+                            {isLoading ? 'Updating...' : 'Update'}
                         </Button>
                     </div>
                 </Modal.Footer>
             </Modal>
-
         </div>
+
     );
 };
 

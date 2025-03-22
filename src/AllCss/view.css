@@ -1,0 +1,74 @@
+.container-fluid-div {
+    width: 1250px;
+    height: 100vh;
+}
+
+.view-div {
+    display: flex;
+    justify-content: center;  
+    align-items: center;      
+}
+
+pre {
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto; 
+}
+
+.custom-select-with-icon {
+    padding-right: 30px; 
+    appearance: none; 
+}
+
+.custom-select-with-icon::-ms-expand {
+    display: none; 
+}
+
+.custom-select-with-icon {
+    background: url('https://static.thenounproject.com/png/1123247-200.png') no-repeat right 15px center;
+    background-size: 20px; 
+}
+
+
+
+@media (max-width: 1000px) {
+    .container-fluid-div {
+        width: 100%;
+    }
+}
+
+@media (max-width: 767px) {
+    .container-fluid-div {
+        padding: 10px;
+    }
+
+    .view-div {
+        padding: 10px;
+    }
+
+    pre {
+        font-size: 12px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    .view-div {
+        padding: 15px; 
+    }
+
+    pre {
+        font-size: 13px; 
+    }
+}
+
+@media (min-width: 992px) {
+    .view-div {
+        padding: 20px;
+    }
+
+    pre {
+        font-size: 14px;
+    }
+}
