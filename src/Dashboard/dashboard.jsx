@@ -246,7 +246,7 @@ const Dashboard = () => {
     useEffect(() => {
         const fetchToggleState = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/api/config/toggle-state');
+                const response = await axios.get('https://video-call-backend-production-4619.up.railway.app/api/config/toggle-state');
                 setIsChecked(response.data.toggle_state);
             } catch (error) {
                 console.error("Error fetching toggle state", error);
